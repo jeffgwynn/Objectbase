@@ -1,0 +1,40 @@
+public abstract class ObjectBase : INotifyPropertyChanged
+   2:      {
+   3:          public event PropertyChangedEventHandler PropertyChanged;
+   4:   
+   5:          protected internal void OnPropertyChanged(string propertyName)
+   6:          {
+   7:              if (this.PropertyChanged != null)
+   8:                  this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+   9:          }
+  10:   
+  11:          protected virtual void OnPropertyChanged<T>(Expression<Func<T>> propertyExpression)
+  12:          {
+  13:              var propertyName = ExtractPropertyName(propertyExpression);
+  14:              OnPropertyChanged(propertyName);
+  15:          }
+  16:   
+  17:          static string ExtractPropertyName<T>(Expression<Func<T>> propertyExpression)
+  18:          {
+  19:              if (propertyExpression == null)
+  20:              {
+  21:                  throw new ArgumentNullException("propertyExpression");
+  22:              }
+  23:   
+  24:              var memberExpression = propertyExpression.Body as MemberExpression;
+  25:              if (memberExpression == null)
+  26:                  throw new Exception();
+  27:   
+  28:              var property = memberExpression.Member as PropertyInfo;
+  29:              if (property == null)
+  30:                  if (memberExpression == null)
+  31:                      throw new Exception();
+  32:   
+  33:              var getMethod = property.GetGetMethod(true);
+  34:              if (getMethod.IsStatic)
+  35:                  if (memberExpression == null)
+  36:                      throw new Exception();
+  37:   
+  38:              return memberExpression.Member.Name;
+  39:          }
+  40:      }
